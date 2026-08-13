@@ -1,11 +1,13 @@
 import {
   createContext,
   useContext,
+  useEffect,
   useState,
   type PropsWithChildren,
 } from "react";
 
 import {
+  getCurrentUserRequest,
   loginRequest,
   logoutRequest,
   registerRequest,
@@ -19,12 +21,15 @@ import {
 } from "./token-storage";
 
 import type {
+  CurrentUser,
   LoginRequest,
   RegisterRequest,
 } from "../types/auth";
 
 type AuthContextValue = {
+  user: CurrentUser | null;
   isAuthenticated: boolean;
+  isLoading: boolean;
   login: (data: LoginRequest) => Promise<void>;
   register: (data: RegisterRequest) => Promise<void>;
   logout: () => Promise<void>;
@@ -35,24 +40,78 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 export function AuthProvider({
   children,
 }: PropsWithChildren) {
-  const [isAuthenticated, setIsAuthenticated] = useState(
+    const [user, setUser] = useState<CurrentUser | null>(null);
+
+    const [isAuthenticated, setIsAuthenticated] = useState(
     () => hasTokens(),
-  );
+    );
+
+    const [isLoading, setIsLoading] = useState(
+    () => hasTokens(),
+    );
+
+    useEffect(() => {
+    async function loadCurrentUser(): Promise<void> {
+        if (!hasTokens()) {
+        setIsLoading(false);
+        return;
+        }
+
+        try {
+        const currentUser = await getCurrentUserRequest();
+
+        setUser(currentUser);
+        setIsAuthenticated(true);
+        } catch {
+        clearTokens();
+        setUser(null);
+        setIsAuthenticated(false);
+        } finally {
+        setIsLoading(false);
+        }
+    }
+
+    void loadCurrentUser();
+    }, []);
 
   async function login(data: LoginRequest): Promise<void> {
     const tokens = await loginRequest(data);
 
     saveTokens(tokens);
-    setIsAuthenticated(true);
+
+    try {
+        const currentUser = await getCurrentUserRequest();
+
+        setUser(currentUser);
+        setIsAuthenticated(true);
+    } catch (error) {
+        clearTokens();
+        setUser(null);
+        setIsAuthenticated(false);
+
+        throw error;
+    }
   }
 
   async function register(
     data: RegisterRequest,
-  ): Promise<void> {
+    ): Promise<void> {
     const tokens = await registerRequest(data);
 
     saveTokens(tokens);
-    setIsAuthenticated(true);
+
+    try {
+        const currentUser = await getCurrentUserRequest();
+
+        setUser(currentUser);
+        setIsAuthenticated(true);
+    } catch (error) {
+        clearTokens();
+        setUser(null);
+        setIsAuthenticated(false);
+
+        throw error;
+    }
   }
 
   async function logout(): Promise<void> {
@@ -64,20 +123,23 @@ export function AuthProvider({
         }
     } finally {
         clearTokens();
+        setUser(null);
         setIsAuthenticated(false);
     }
   }
 
   return (
     <AuthContext.Provider
-      value={{
+        value={{
+        user,
         isAuthenticated,
+        isLoading,
         login,
         register,
         logout,
-      }}
+        }}
     >
-      {children}
+        {children}
     </AuthContext.Provider>
   );
 }

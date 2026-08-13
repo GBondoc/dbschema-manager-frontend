@@ -7,11 +7,13 @@ import {
 import { ProtectedRoute } from "../auth/ProtectedRoute";
 import { PublicRoute } from "../auth/PublicRoute";
 
-import { DashboardPage } from "../pages/DashboardPage";
 import { LoginPage } from "../pages/LoginPage";
 import { RegisterPage } from "../pages/RegisterPage";
 
 import { HomeRedirect } from "./HomeRedirect";
+
+import { ProjectsPage } from "../pages/ProjectsPage";
+import { ProjectPage } from "../pages/ProjectPage";
 
 export function AppRouter() {
   return (
@@ -42,8 +44,17 @@ export function AppRouter() {
       <Route
         path="/dashboard"
         element={
+            <ProtectedRoute>
+                <ProjectsPage />
+            </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/projects/:projectId"
+        element={
           <ProtectedRoute>
-            <DashboardPage />
+            <ProjectPage />
           </ProtectedRoute>
         }
       />

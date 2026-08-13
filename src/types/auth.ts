@@ -14,3 +14,9 @@ export type RegisterRequest = {
   email: string;
   password: string;
 };
+
+export type CurrentUser = {
+  id: string;
+  email: string;
+  displayedName: string | null;
+};

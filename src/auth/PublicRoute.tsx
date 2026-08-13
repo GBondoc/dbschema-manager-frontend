@@ -10,7 +10,14 @@ type PublicRouteProps = {
 export function PublicRoute({
   children,
 }: PublicRouteProps) {
-  const { isAuthenticated } = useAuth();
+  const {
+    isAuthenticated,
+    isLoading,
+  } = useAuth();
+
+  if (isLoading) {
+    return <p>Se încarcă...</p>;
+  }
 
   if (isAuthenticated) {
     return <Navigate to="/dashboard" replace />;

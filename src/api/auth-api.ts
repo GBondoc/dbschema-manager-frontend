@@ -2,6 +2,7 @@ import { apiClient } from "./api-client";
 
 import type {
   AuthTokens,
+  CurrentUser,
   LoginRequest,
   RegisterRequest,
 } from "../types/auth";
@@ -34,4 +35,10 @@ export async function logoutRequest(
   await apiClient.post("/auth/logout", {
     sessionId,
   });
+}
+
+export async function getCurrentUserRequest(): Promise<CurrentUser> {
+  const response = await apiClient.get<CurrentUser>("/auth/me");
+
+  return response.data;
 }
