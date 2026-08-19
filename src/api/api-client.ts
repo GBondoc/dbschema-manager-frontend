@@ -57,10 +57,17 @@ apiClient.interceptors.response.use(
     const originalRequest =
       error.config as RetryableRequestConfig | undefined;
 
+    const requestUrl = originalRequest?.url ?? "";
+
+    const isAuthRequest =
+      requestUrl.includes("/auth/login") ||
+      requestUrl.includes("/auth/register");
+
     if (
       error.response?.status !== 401 ||
       !originalRequest ||
-      originalRequest._retry
+      originalRequest._retry ||
+      isAuthRequest
     ) {
       return Promise.reject(error);
     }
