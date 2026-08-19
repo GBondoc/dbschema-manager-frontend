@@ -591,11 +591,11 @@ export function ProjectsPage() {
                       </DropdownMenu>
                     </div>
 
-                    <h3 className="mt-5 break-words text-xl font-semibold">
+                    <h3 className="mt-5 wrap-break-word text-xl font-semibold">
                       {project.name}
                     </h3>
 
-                    <p className="mt-2 line-clamp-3 break-words text-sm leading-6 text-muted-foreground">
+                    <p className="mt-2 line-clamp-3 wrap-break-word text-sm leading-6 text-muted-foreground">
                       {project.description ||
                         "Proiect fără descriere."}
                     </p>
@@ -648,11 +648,11 @@ export function ProjectsPage() {
                       </span>
                     </div>
 
-                    <h3 className="mt-5 break-words text-xl font-semibold">
+                    <h3 className="mt-5 wrap-break-word text-xl font-semibold">
                       {project.name}
                     </h3>
 
-                    <p className="mt-2 line-clamp-3 break-words text-sm leading-6 text-muted-foreground">
+                    <p className="mt-2 line-clamp-3 wrap-break-word text-sm leading-6 text-muted-foreground">
                       {project.description ||
                         "Proiect fără descriere."}
                     </p>

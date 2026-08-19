@@ -89,11 +89,11 @@ export function ProjectPage() {
                   MySQL
                 </span>
 
-                <h1 className="mt-4 break-words text-3xl font-bold tracking-tight">
+                <h1 className="mt-4 wrap-break-word text-3xl font-bold tracking-tight">
                   {project.name}
                 </h1>
 
-                <p className="mt-2 max-w-3xl break-words text-sm leading-6 text-muted-foreground">
+                <p className="mt-2 max-w-3xl wrap-break-word text-sm leading-6 text-muted-foreground">
                   {project.description ||
                     "Proiect fără descriere."}
                 </p>
