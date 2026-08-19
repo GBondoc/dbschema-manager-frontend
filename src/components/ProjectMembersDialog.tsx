@@ -20,6 +20,7 @@ import {
   removeProjectMemberRequest,
   revokeProjectInviteRequest,
   updateProjectMemberRoleRequest,
+  leaveProjectRequest,
 } from "../features/project-members/project-member-api";
 
 import type {
@@ -112,6 +113,12 @@ export function ProjectMembersDialog({
 
   const [inviteToRevoke, setInviteToRevoke] =
     useState<ProjectInvite | null>(null);
+
+  const [isLeaving, setIsLeaving] =
+    useState(false);
+
+  const [showLeaveConfirm, setShowLeaveConfirm] =
+    useState(false);
 
   useEffect(() => {
     if (!open) {
@@ -355,6 +362,25 @@ export function ProjectMembersDialog({
       );
     } finally {
       setRemovingMemberId(null);
+    }
+  }
+
+  async function handleLeaveProject(): Promise<void> {
+    setError("");
+    setIsLeaving(true);
+
+    try {
+      await leaveProjectRequest(projectId);
+
+      onOpenChange(false);
+
+      window.location.href = "/dashboard";
+    } catch {
+      setError(
+        "Nu ai putut părăsi proiectul.",
+      );
+    } finally {
+      setIsLeaving(false);
     }
   }
 
@@ -704,6 +730,31 @@ export function ProjectMembersDialog({
                   </section>
                 </>
               )}
+
+              <div className="flex flex-col gap-8">
+              {/* LEAVE PROJECT */}
+              {!isOwner && (
+                <section className="rounded-xl border border-destructive/30 bg-destructive/5 p-5">
+                  <h3 className="text-sm font-semibold">
+                    Părăsește proiectul
+                  </h3>
+
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    Vei pierde accesul la proiect și va trebui să primești
+                    o nouă invitație pentru a te alătura din nou.
+                  </p>
+
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="mt-4 text-destructive hover:bg-destructive/10 hover:text-destructive"
+                    onClick={() => setShowLeaveConfirm(true)}
+                  >
+                    Părăsește proiectul
+                  </Button>
+                </section>
+              )}
+            </div>
             </div>
           )}
         </DialogContent>
@@ -852,6 +903,44 @@ export function ProjectMembersDialog({
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
               Revocă
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog
+        open={showLeaveConfirm}
+        onOpenChange={setShowLeaveConfirm}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              Părăsești proiectul?
+            </AlertDialogTitle>
+
+            <AlertDialogDescription>
+              Ești sigur că vrei să părăsești acest proiect?
+              Vei pierde accesul și vei avea nevoie de o nouă invitație pentru a te alătura din nou.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isLeaving}>
+              Anulează
+            </AlertDialogCancel>
+
+            <AlertDialogAction
+              disabled={isLeaving}
+              onClick={(event) => {
+                event.preventDefault();
+
+                void handleLeaveProject();
+              }}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {isLeaving
+                ? "Se părăsește..."
+                : "Părăsește proiectul"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

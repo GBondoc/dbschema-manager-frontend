@@ -107,3 +107,11 @@ export async function removeProjectMemberRequest(
     `/projects/${projectId}/members/${memberId}`,
   );
 }
+
+export async function leaveProjectRequest(
+  projectId: string,
+): Promise<void> {
+  await apiClient.delete(
+    `/projects/${projectId}/members/me`,
+  );
+}
