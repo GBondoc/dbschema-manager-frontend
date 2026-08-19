@@ -1,5 +1,9 @@
 import { useState, type FormEvent } from "react";
-import { Link, useNavigate } from "react-router";
+import {
+  Link,
+  useLocation,
+  useNavigate,
+} from "react-router";
 
 import { useAuth } from "../auth/AuthContext";
 import { AuthLayout } from "../layouts/AuthLayout";
@@ -10,6 +14,14 @@ import { Input } from "@/components/ui/input";
 export function RegisterPage() {
   const { register } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const locationState = location.state as {
+    from?: string;
+  } | null;
+
+  const redirectTo =
+    locationState?.from ?? "/dashboard";
 
   const [displayedName, setDisplayedName] = useState("");
   const [email, setEmail] = useState("");
@@ -40,7 +52,7 @@ export function RegisterPage() {
         password,
       });
 
-      navigate("/dashboard", {
+      navigate(redirectTo, {
         replace: true,
       });
     } catch {
@@ -164,8 +176,11 @@ export function RegisterPage() {
 
       <p className="mt-6 text-center text-sm text-muted-foreground">
         Ai deja cont?{" "}
-        <Link
+       <Link
           to="/login"
+          state={{
+            from: redirectTo,
+          }}
           className="font-medium text-primary hover:underline"
         >
           Autentifică-te

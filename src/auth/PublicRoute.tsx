@@ -1,5 +1,8 @@
 import type { ReactNode } from "react";
-import { Navigate } from "react-router";
+import {
+  Navigate,
+  useLocation,
+} from "react-router";
 
 import { useAuth } from "./AuthContext";
 
@@ -15,12 +18,26 @@ export function PublicRoute({
     isLoading,
   } = useAuth();
 
+  const location = useLocation();
+
+  const locationState = location.state as {
+    from?: string;
+  } | null;
+
+  const redirectTo =
+    locationState?.from ?? "/dashboard";
+
   if (isLoading) {
     return <p>Se încarcă...</p>;
   }
 
   if (isAuthenticated) {
-    return <Navigate to="/dashboard" replace />;
+    return (
+      <Navigate
+        to={redirectTo}
+        replace
+      />
+    );
   }
 
   return children;

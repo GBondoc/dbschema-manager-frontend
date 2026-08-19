@@ -14,6 +14,7 @@ import { HomeRedirect } from "./HomeRedirect";
 
 import { ProjectsPage } from "../pages/ProjectsPage";
 import { ProjectPage } from "../pages/ProjectPage";
+import { InvitePage } from "../pages/InvitePage";
 
 export function AppRouter() {
   return (
@@ -55,6 +56,15 @@ export function AppRouter() {
         element={
           <ProtectedRoute>
             <ProjectPage />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/invite/:token"
+        element={
+          <ProtectedRoute>
+            <InvitePage />
           </ProtectedRoute>
         }
       />

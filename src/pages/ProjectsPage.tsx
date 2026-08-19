@@ -22,7 +22,7 @@ import {
 
 import type { Project } from "../features/projects/project.types";
 
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/button"
 
 import {
   Dialog,
@@ -54,6 +54,8 @@ import {
 
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+
+import { AxiosError } from "axios";
 
 export function ProjectsPage() {
   const navigate = useNavigate();
@@ -120,7 +122,10 @@ export function ProjectsPage() {
       });
 
       setProjects((current) => [
-        project,
+        {
+          ...project,
+          accessRole: "OWNER",
+        },
         ...current,
       ]);
 
@@ -166,7 +171,10 @@ export function ProjectsPage() {
       setProjects((current) =>
         current.map((project) =>
           project.id === updatedProject.id
-            ? updatedProject
+            ? {
+                ...updatedProject,
+                accessRole: project.accessRole,
+              }
             : project,
         ),
       );
@@ -202,14 +210,31 @@ export function ProjectsPage() {
       );
 
       setDeletingProject(null);
-    } catch {
-      setError(
-        "Nu s-a putut șterge proiectul.",
-      );
+    } catch (error) {
+        if (error instanceof AxiosError) {
+          if (error.response?.status === 409) {
+            setError(
+              "Proiectul nu poate fi șters cât timp mai are membri. Elimină membrii proiectului sau așteaptă ca aceștia să părăsească proiectul.",
+            );
+            return;
+          }
+        }
+
+        setError(
+          "Nu s-a putut șterge proiectul.",
+        );
     } finally {
       setIsDeleting(false);
     }
   }
+
+  const ownedProjects = projects.filter(
+    (project) => project.accessRole === "OWNER",
+  );
+
+  const sharedProjects = projects.filter(
+    (project) => project.accessRole !== "OWNER",
+  );
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -220,12 +245,12 @@ export function ProjectsPage() {
         <section className="flex items-start justify-between gap-6">
           <div>
             <h1 className="text-3xl font-bold tracking-tight">
-              Proiectele tale
+              Proiecte
             </h1>
 
             <p className="mt-2 text-sm text-muted-foreground">
-              Creează și administrează schemele MySQL
-              folosite în proiectele tale.
+              Creează proiecte proprii sau lucrează în proiectele
+              partajate cu tine.
             </p>
           </div>
 
@@ -505,11 +530,21 @@ export function ProjectsPage() {
             </section>
           )}
 
-        {/* PROJECT CARDS */}
-        {!isLoading &&
-          projects.length > 0 && (
-            <section className="mt-10 grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
-              {projects.map((project) => (
+        {/* OWNED PROJECTS */}
+        {!isLoading && ownedProjects.length > 0 && (
+          <section className="mt-10">
+            <div>
+              <h2 className="text-xl font-semibold">
+                Proiectele mele
+              </h2>
+
+              <p className="mt-1 text-sm text-muted-foreground">
+                Proiectele create și administrate de tine.
+              </p>
+            </div>
+
+            <div className="mt-5 grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
+              {ownedProjects.map((project) => (
                 <article
                   key={project.id}
                   className="group flex min-h-56 flex-col justify-between rounded-xl border border-border bg-card p-6 transition-colors hover:border-primary/50"
@@ -535,9 +570,7 @@ export function ProjectsPage() {
                           <DropdownMenuGroup>
                             <DropdownMenuItem
                               onClick={() =>
-                                openEditProject(
-                                  project,
-                                )
+                                openEditProject(project)
                               }
                             >
                               <Pencil className="size-4" />
@@ -546,9 +579,7 @@ export function ProjectsPage() {
 
                             <DropdownMenuItem
                               onClick={() =>
-                                setDeletingProject(
-                                  project,
-                                )
+                                setDeletingProject(project)
                               }
                               className="text-destructive focus:bg-destructive/10 focus:text-destructive"
                             >
@@ -560,9 +591,9 @@ export function ProjectsPage() {
                       </DropdownMenu>
                     </div>
 
-                    <h2 className="mt-5 break-words text-xl font-semibold">
+                    <h3 className="mt-5 break-words text-xl font-semibold">
                       {project.name}
-                    </h2>
+                    </h3>
 
                     <p className="mt-2 line-clamp-3 break-words text-sm leading-6 text-muted-foreground">
                       {project.description ||
@@ -573,9 +604,7 @@ export function ProjectsPage() {
                   <button
                     type="button"
                     onClick={() =>
-                      navigate(
-                        `/projects/${project.id}`,
-                      )
+                      navigate(`/projects/${project.id}`)
                     }
                     className="mt-6 w-fit cursor-pointer text-sm font-medium text-primary transition-colors hover:text-primary/80"
                   >
@@ -583,8 +612,66 @@ export function ProjectsPage() {
                   </button>
                 </article>
               ))}
-            </section>
-          )}
+            </div>
+          </section>
+        )}
+
+        {/* SHARED PROJECTS */}
+        {!isLoading && sharedProjects.length > 0 && (
+          <section className="mt-12">
+            <div>
+              <h2 className="text-xl font-semibold">
+                Partajate cu mine
+              </h2>
+
+              <p className="mt-1 text-sm text-muted-foreground">
+                Proiectele în care ai fost invitat să colaborezi.
+              </p>
+            </div>
+
+            <div className="mt-5 grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
+              {sharedProjects.map((project) => (
+                <article
+                  key={project.id}
+                  className="group flex min-h-56 flex-col justify-between rounded-xl border border-border bg-card p-6 transition-colors hover:border-primary/50"
+                >
+                  <div>
+                    <div className="flex items-start justify-between gap-4">
+                      <span className="inline-flex rounded-full border border-primary/30 bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary">
+                        MySQL
+                      </span>
+
+                      <span className="rounded-md border border-border bg-secondary px-2.5 py-1 text-xs font-medium text-muted-foreground">
+                        {project.accessRole === "EDITOR"
+                          ? "Editor"
+                          : "Vizualizator"}
+                      </span>
+                    </div>
+
+                    <h3 className="mt-5 break-words text-xl font-semibold">
+                      {project.name}
+                    </h3>
+
+                    <p className="mt-2 line-clamp-3 break-words text-sm leading-6 text-muted-foreground">
+                      {project.description ||
+                        "Proiect fără descriere."}
+                    </p>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() =>
+                      navigate(`/projects/${project.id}`)
+                    }
+                    className="mt-6 w-fit cursor-pointer text-sm font-medium text-primary transition-colors hover:text-primary/80"
+                  >
+                    Deschide proiectul →
+                  </button>
+                </article>
+              ))}
+            </div>
+          </section>
+        )}
       </main>
     </div>
   );

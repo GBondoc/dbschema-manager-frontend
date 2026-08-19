@@ -1,5 +1,9 @@
 import { useState, type FormEvent } from "react";
-import { Link, useNavigate } from "react-router";
+import {
+  Link,
+  useLocation,
+  useNavigate,
+} from "react-router";
 
 import { useAuth } from "../auth/AuthContext";
 import { AuthLayout } from "../layouts/AuthLayout";
@@ -10,6 +14,14 @@ import { Input } from "@/components/ui/input";
 export function LoginPage() {
   const { login } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const locationState = location.state as {
+    from?: string;
+  } | null;
+
+  const redirectTo =
+    locationState?.from ?? "/dashboard";
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -31,7 +43,7 @@ export function LoginPage() {
         password,
       });
 
-      navigate("/dashboard", {
+      navigate(redirectTo, {
         replace: true,
       });
     } catch {
@@ -116,6 +128,9 @@ export function LoginPage() {
         Nu ai cont?{" "}
         <Link
           to="/register"
+          state={{
+            from: redirectTo,
+          }}
           className="font-medium text-primary hover:underline"
         >
           Creează un cont

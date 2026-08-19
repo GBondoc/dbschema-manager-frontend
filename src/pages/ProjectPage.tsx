@@ -13,6 +13,11 @@ import { getProjectRequest } from "../features/projects/projects-api";
 
 import type { Project } from "../features/projects/project.types";
 
+import { ProjectMembersDialog } from "../components/ProjectMembersDialog";
+import { Button } from "@/components/ui/button";
+
+import { Users } from "lucide-react";
+
 export function ProjectPage() {
   const { projectId } = useParams();
 
@@ -24,6 +29,9 @@ export function ProjectPage() {
 
   const [error, setError] =
     useState("");
+
+  const [showMembers, setShowMembers] =
+    useState(false);
 
   useEffect(() => {
     async function loadProject(): Promise<void> {
@@ -75,20 +83,38 @@ export function ProjectPage() {
 
         {!isLoading && project && (
           <>
-            <section className="mt-8">
-              <span className="inline-flex rounded-full border border-primary/30 bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary">
-                MySQL
-              </span>
+            <section className="mt-8 flex items-start justify-between gap-6">
+              <div>
+                <span className="inline-flex rounded-full border border-primary/30 bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary">
+                  MySQL
+                </span>
 
-              <h1 className="mt-4 break-words text-3xl font-bold tracking-tight">
-                {project.name}
-              </h1>
+                <h1 className="mt-4 break-words text-3xl font-bold tracking-tight">
+                  {project.name}
+                </h1>
 
-              <p className="mt-2 max-w-3xl break-words text-sm leading-6 text-muted-foreground">
-                {project.description ||
-                  "Proiect fără descriere."}
-              </p>
+                <p className="mt-2 max-w-3xl break-words text-sm leading-6 text-muted-foreground">
+                  {project.description ||
+                    "Proiect fără descriere."}
+                </p>
+              </div>
+
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setShowMembers(true)}
+              >
+                <Users className="size-4" />
+                Membrii proiectului
+              </Button>
             </section>
+
+            <ProjectMembersDialog
+              projectId={project.id}
+              accessRole={project.accessRole}
+              open={showMembers}
+              onOpenChange={setShowMembers}
+            />
 
             <section className="mt-10 rounded-xl border border-border bg-card p-6">
               <h2 className="text-xl font-semibold">

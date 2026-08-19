@@ -1,9 +1,16 @@
+export type ProjectAccessRole =
+  | "OWNER"
+  | "EDITOR"
+  | "VIEWER";
+
 export type Project = {
   id: string;
   ownerUserId: string;
   name: string;
   description: string | null;
   dialect: string;
+  accessRole: ProjectAccessRole;
+
   createdAt?: string;
   updatedAt?: string;
   created_at?: string;
