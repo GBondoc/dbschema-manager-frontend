@@ -67,6 +67,7 @@ import {
 } from "../features/columns/column-api";
 
 import { ColumnFormFields } from "../components/ColumnFormFields";
+import { PrimaryKeySection } from "../components/PrimaryKeySection";
 
 export function ProjectPage() {
   const { projectId } = useParams();
@@ -792,10 +793,6 @@ const [columnDefaultValue, setColumnDefaultValue] =
                       <h2 className="wrap-break-word text-2xl font-bold">
                         {selectedTable.name}
                       </h2>
-
-                      <p className="mt-2 text-sm text-muted-foreground">
-                        Structura tabelului selectat.
-                      </p>
                     </div>
 
                     {project.accessRole !== "VIEWER" && (
@@ -832,6 +829,14 @@ const [columnDefaultValue, setColumnDefaultValue] =
                     )}
                   </div>
 
+                  <div className="mt-6">
+                    <PrimaryKeySection
+                      projectId={project.id}
+                      tableId={selectedTable.id}
+                      columns={columns}
+                      canEdit={project.accessRole !== "VIEWER"}
+                    />
+                  </div>
                   <div className="mt-10 rounded-xl border border-border bg-background/40">
                     <div className="flex items-center justify-between border-b border-border px-5 py-4">
                       <h3 className="text-sm font-semibold">
