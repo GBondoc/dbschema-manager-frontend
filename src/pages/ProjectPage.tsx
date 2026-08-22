@@ -226,44 +226,21 @@ export function ProjectPage() {
                 />
 
                 <SelectedTablePanel
-                  projectId={
-                    project.id
-                  }
-                  table={
-                    selectedTable
-                  }
-                  columns={
-                    columns
-                  }
-                  tableError={
-                    tableError
-                  }
-                  columnError={
-                    columnError
-                  }
-                  isLoadingColumns={
-                    isLoadingColumns
-                  }
-                  canEdit={
-                    canEdit
-                  }
-                  onEditTable={
-                    setEditingTable
-                  }
-                  onDeleteTable={
-                    setDeletingTable
-                  }
+                  projectId={project.id}
+                  table={selectedTable}
+                  tables={tables}
+                  columns={columns}
+                  tableError={tableError}
+                  columnError={columnError}
+                  isLoadingColumns={isLoadingColumns}
+                  canEdit={canEdit}
+                  onEditTable={setEditingTable}
+                  onDeleteTable={setDeletingTable}
                   onCreateColumn={() =>
-                    setShowCreateColumn(
-                      true,
-                    )
+                    setShowCreateColumn(true)
                   }
-                  onEditColumn={
-                    setEditingColumn
-                  }
-                  onDeleteColumn={
-                    setDeletingColumn
-                  }
+                  onEditColumn={setEditingColumn}
+                  onDeleteColumn={setDeletingColumn}
                 />
               </section>
 

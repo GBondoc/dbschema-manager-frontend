@@ -25,3 +25,51 @@ export type SetPrimaryKeyPayload = {
 export type PrimaryKeyResponse = {
   primaryKey: PrimaryKey | null;
 };
+
+export type ForeignKeyColumn = {
+  id: string;
+
+  column: {
+    id: string;
+    name: string;
+  };
+
+  referencedColumn: {
+    id: string;
+    name: string;
+  } | null;
+
+  position: number;
+};
+
+export type ForeignKey = {
+  id: string;
+  tableId: string;
+  type: "FOREIGN_KEY";
+  name: string | null;
+
+  referencedTable: {
+    id: string;
+    name: string;
+  } | null;
+
+  columns: ForeignKeyColumn[];
+};
+
+export type CreateForeignKeyPayload = {
+  referencedTableId: string;
+
+  columns: {
+    columnId: string;
+    referencedColumnId: string;
+  }[];
+};
+
+export type UpdateForeignKeyPayload = {
+  referencedTableId: string;
+
+  columns: {
+    columnId: string;
+    referencedColumnId: string;
+  }[];
+};

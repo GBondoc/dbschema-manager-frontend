@@ -11,11 +11,13 @@ import { TableColumnsSection } from "./TableColumnsSection";
 
 import type { DbTable } from "../../features/tables/table.types";
 import type { DbColumn } from "../../features/columns/column.types";
+import { ForeignKeysManager } from "./ForeignKeysManager";
 
 type SelectedTablePanelProps = {
   projectId: string;
 
   table: DbTable | null;
+  tables: DbTable[];
   columns: DbColumn[];
 
   tableError: string;
@@ -46,6 +48,7 @@ type SelectedTablePanelProps = {
 export function SelectedTablePanel({
   projectId,
   table,
+  tables,
   columns,
   tableError,
   columnError,
@@ -140,6 +143,14 @@ export function SelectedTablePanel({
             onCreate={onCreateColumn}
             onEdit={onEditColumn}
             onDelete={onDeleteColumn}
+          />
+
+          <ForeignKeysManager
+            projectId={projectId}
+            tableId={table.id}
+            tables={tables}
+            localColumns={columns}
+            canEdit={canEdit}
           />
         </>
       )}
